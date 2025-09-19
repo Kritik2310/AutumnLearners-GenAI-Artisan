@@ -18,7 +18,6 @@ const LandingPage = ({uploadedImages,artisanData}) => {
             "https://via.placeholder.com/200",
         ],
     };
-
     return (
         <div className="main">
             <HeroSection 
