@@ -1,0 +1,27 @@
+{
+  "artisanData": {
+    "artisanName": "kriti",
+    "phoneNum": "9076290446",
+    "email": "kriti@gmail.com",
+    "shopAddress": "pune 412106"
+  },
+  "uploadedImages": [
+    {
+      "path": "./photo-1444703686981-a3abbc4d4fe3.jfif",
+      "relativePath": "./photo-1444703686981-a3abbc4d4fe3.jfif"
+    },
+    {
+      "path": "./Picture1.jpg",
+      "relativePath": "./Picture1.jpg"
+    },
+    {
+      "path": "./Picture2.png",
+      "relativePath": "./Picture2.png"
+    },
+    {
+      "path": "./Picture3.png",
+      "relativePath": "./Picture3.png"
+    }
+  ],
+  "audioFile": {}
+}
