@@ -20,3 +20,5 @@ git+https://github.com/openai/whisper.git
 ffmpeg-python~=0.2.0
 
 keybert
+
+pip uninstall torch torchvision torchaudio -y
