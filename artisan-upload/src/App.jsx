@@ -1,18 +1,19 @@
-import React,{useState} from "react";
+import React, { useState } from "react";
 import Navbar from "./components/Navbar";
-import {BrowserRouter as Router, Route,Routes,Link} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import LandingPage from "./pages/LandingPage";
 
 const App = () => {
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [artisanData,setArtisanData] = useState(null);
+  
+  const [uploadedImages, setUploadedImages] = useState([]); 
+  const [artisanData, setArtisanData] = useState(null);
 
   const updateArtisanData = (data) => {
     setArtisanData(data);
-  }
+  };
 
-  return(
+  return (
     <Router>
       <div>
         <div className="bg-container"></div>
@@ -21,11 +22,22 @@ const App = () => {
           <Routes>
             <Route
               path="/"
-              element={<MainPage updateUploadedImages={setUploadedImages} updateArtisanData={updateArtisanData}/>} // Pass prop to MainPage
+              element={
+                <MainPage
+                  updateUploadedImages={setUploadedImages}
+                  updateArtisanData={updateArtisanData}
+                  uploadedImages={uploadedImages}
+                />
+              }
             />
             <Route
               path="/landing"
-              element={<LandingPage uploadedImages={uploadedImages} artisanData={artisanData}/>} // Pass prop to LandingPage
+              element={
+                <LandingPage
+                  uploadedImages={uploadedImages}
+                  artisanData={artisanData}
+                />
+              }
             />
           </Routes>
         </div>
@@ -35,5 +47,3 @@ const App = () => {
 };
 
 export default App;
-
-// pt-20 to add padding

@@ -4,17 +4,18 @@ import ImageUpload from "../components/ImageUpload";
 import AudioInput from "../components/AudioUpload";
 import ContactUpload from "../components/ContactUpload";
 
-const MainPage = ({updateUploadedImages,updateArtisanData}) => {
+const MainPage = ({ updateUploadedImages, updateArtisanData }) => {
   const [uploadedImages, setUploadedImages] = useState([]);
   const [audioFile, setAudioFile] = useState(null);
   const [artisanData, setArtisanData] = useState(null);
+  const [backendResponse, setBackendResponse] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   const handleImageUpload = (files) => {
     console.log("Uploaded images:", files);
-    const fileP = files.map((file) => URL.createObjectURL(file));
-    setUploadedImages(fileP);
-    updateUploadedImages(fileP);
+    setUploadedImages(files); 
+    updateUploadedImages(files);
   };
 
   const handleAudioUpload = (audio) => {
@@ -22,51 +23,45 @@ const MainPage = ({updateUploadedImages,updateArtisanData}) => {
     setAudioFile(audio);
   };
 
+  const handleBackendResponse = (response) => {
+    console.log("Backend AI response received:", response);
+    setBackendResponse(response);
+    setIsProcessing(false);
+  };
+
   const handleContactSubmit = (data) => {
-    console.log("Contact data submitted:", data); 
+    console.log("Contact data submitted:", data);
     setArtisanData(data);
     updateArtisanData(data);
   };
 
   const handleSubmit = async () => {
+    if (!backendResponse) {
+      alert("Please upload and process an audio file first!");
+      return;
+    }
     if (!artisanData) {
-      console.error("Artisan data missing");
+      alert("Please submit your contact details!");
+      return;
+    }
+    if (!uploadedImages || uploadedImages.length === 0) {
+      alert("Please upload at least one product image!");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("artisanData", JSON.stringify(artisanData));
+    console.log("All data collected, navigating to landing page...");
+    console.log("Backend Response:", backendResponse);
+    console.log("Artisan Data:", artisanData);
+    console.log("Images:", uploadedImages);
 
-    uploadedImages.forEach((image) => {
-      formData.append("images", image);
+    // Navigate to landing page 
+    navigate("/landing", {
+      state: {
+        backendResponse: backendResponse,
+        artisanData: artisanData,
+        uploadedImages: uploadedImages,
+      },
     });
-
-    if (audioFile) {
-      formData.append("audioFile", audioFile); 
-    }
-
-    console.log("FormData entries being sent:");
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    try {
-      const response = await fetch("http://localhost:5000/api/save_artisan_data", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const resData = await response.json();
-      console.log("Server response:", resData);
-    } catch (error) {
-      console.error("Error uploading data:", error);
-    }
-    //navigate to landing page
-    navigate("/landing");
   };
 
   return (
@@ -77,8 +72,22 @@ const MainPage = ({updateUploadedImages,updateArtisanData}) => {
       <p className="mt-4 text-lg text-center text-[#3e2723]">
         Follow these steps to let us evolve your story virtually...
       </p>
+
+
+      <div className="mt-6 flex justify-center gap-4">
+        <div className={`px-4 py-2 rounded-full ${uploadedImages.length > 0 ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+          {uploadedImages.length > 0 ? '✓' : '1'} Images
+        </div>
+        <div className={`px-4 py-2 rounded-full ${backendResponse ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+          {backendResponse ? '✓' : '2'} Audio
+        </div>
+        <div className={`px-4 py-2 rounded-full ${artisanData ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-600'}`}>
+          {artisanData ? '✓' : '3'} Contact
+        </div>
+      </div>
+
       <div className="mt-8">
-        {/* step 1 */}
+        {/* Step 1: Upload Images */}
         <div className="step-box">
           <h3 className="text-2xl font-semibold text-[#3e2723] text-center">
             <i className="fas fa-camera-retro mr-2"></i>
@@ -89,11 +98,11 @@ const MainPage = ({updateUploadedImages,updateArtisanData}) => {
           </p>
           <ImageUpload onImageUpload={handleImageUpload} />
           <div className="step-text">
-            Add photos that crave out your creativity and grab user attention
+            Add photos that carve out your creativity and grab user attention
           </div>
         </div>
 
-        {/* step 2 */}
+        {/* Step 2: Upload Audio */}
         <div className="step-box">
           <h3 className="text-2xl font-semibold text-[#3e2723] mt-6 text-center">
             <i className="fas fa-microphone-alt mr-2"></i>
@@ -102,13 +111,23 @@ const MainPage = ({updateUploadedImages,updateArtisanData}) => {
           <p className="mt-2 text-lg text-[#3e2723] text-center">
             Record or upload a voice note explaining your craftsmanship.
           </p>
-          <AudioInput onAudioUpload={handleAudioUpload} />
+          <AudioInput 
+            onBackendResponse={handleBackendResponse}
+            setIsProcessing={setIsProcessing}
+          />
+          {backendResponse && (
+            <div className="mt-4 p-4 bg-green-100 border border-green-400 rounded-lg text-center">
+              <p className="text-green-800 font-semibold">
+                ✓ Audio processed successfully! AI has generated your story.
+              </p>
+            </div>
+          )}
           <div className="step-text">
             Record your voice and explain points and USPs about your business for us to make sales easy
           </div>
         </div>
 
-        {/* step 3 */}
+        {/* Step 3: Contact Details */}
         <div className="step-box">
           <h3 className="text-2xl font-semibold text-[#3e2723] mt-6 text-center">
             <i className="fas fa-phone-alt text-dark-brown mr-2"></i>
@@ -123,11 +142,19 @@ const MainPage = ({updateUploadedImages,updateArtisanData}) => {
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           onClick={handleSubmit}
-          className="mt-4 bg-dark-brown text-yellow-100 py-2 px-6 rounded-full items-center mx-auto block"
+          disabled={isProcessing}
+          className={`
+            mt-8 py-3 px-8 rounded-full items-center mx-auto block text-lg font-semibold
+            ${isProcessing 
+              ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+              : 'bg-dark-brown text-yellow-100 hover:bg-[#6b8e23] transition-all shadow-lg hover:shadow-xl'
+            }
+          `}
         >
-          Let's get started!
+          {isProcessing ? "Processing..." : "Let's get started! →"}
         </button>
       </div>
     </div>
