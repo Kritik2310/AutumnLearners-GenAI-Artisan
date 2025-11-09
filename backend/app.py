@@ -31,7 +31,7 @@ print(f"Using device: {device}")
 torch_device = 0 if device == "cuda" else -1
 
 #Models Loading
-whisper_model = whisper.load_model("base", device=device)
+whisper_model = whisper.load_model("medium", device=device)
 summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6", device=torch_device)
 generator = pipeline("text2text-generation", model="google/flan-t5-large", device=torch_device)
 
@@ -124,8 +124,9 @@ def process_audio_upload():
         sf.write(cleaned_filepath, reduced_noise_audio, samplerate)
 
 
-        transcription_result = whisper_model.transcribe(cleaned_filepath)
+        transcription_result = whisper_model.transcribe(cleaned_filepath, task="translate")
         transcript = transcription_result['text'].strip()
+        detected_lang = transcription_result.get('language', '')
         os.remove(cleaned_filepath)
         print("Transcription complete")
 
