@@ -51,7 +51,7 @@ def generate_structured_content(transcript):
     if len(transcript.split()) < 30:
         about_text = transcript
     else:
-        summary_result = summarizer(transcript, max_length=100, min_length=25, do_sample=False)
+        summary_result = summarizer(transcript, max_length=250, min_length=50, do_sample=False)
         about_text = summary_result[0]['summary_text']
     print("   - 'About Text' generated.")
 
@@ -64,7 +64,13 @@ def generate_structured_content(transcript):
     about_text = dedupe_starting_name(about_text, artisan_name)
 
 
-    description_prompt = f"""Act as a creative copywriter. Rewrite the artisan's transcript in a professional, first-person tone. Transcript: \"{transcript}\" """
+    description_prompt = (
+    "Act as a skilled creative writer. Rewrite the artisan's transcript in English, making it engaging and detailed. "
+    "Capture all specific events, personal feelings, cultural background, and artisan techniques mentioned in the transcript. "
+    "Expand the story to at least 150 words in first-person, making the artisan's journey and craft come alive. "
+    f"Transcript: \"{transcript}\""
+)
+
     generation_params = {
         "max_new_tokens": 250,
         "num_beams": 4,
